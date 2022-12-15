@@ -1,6 +1,17 @@
 import sys
 from traverser import FilesScanner, Volume
 
+#
+# sf: class SnapFile(object)
+#   .name               name of file
+#   .snap_paths         List of 10 (num of snapshots) with None or FileEntry for each
+#   .scanners_results   dict{"ScannerName": result}, while result is None (if scanner doesn't match) or earliest snapshot index
+#
+# FileEntry:
+#   __str__, .path      file path
+#   .entropy            entropy of file
+#
+
 class DisappearedScanner(FilesScanner):
     @property
     def name(self):
@@ -10,6 +21,21 @@ class DisappearedScanner(FilesScanner):
         if None in sf.snap_paths:
             last_index = sf.snap_paths.index(None)
             return last_index
+
+        return None
+
+class EntropyScanner(FilesScanner):
+    @property
+    def name(self):
+        return 'EntropyScanner'
+
+    def scan(self, sf):
+        entropies_thresholds = {
+            'jpg': 10,
+        }
+        #  if None in sf.snap_paths:
+        #      last_index = sf.snap_paths.index(None)
+        #      return last_index
 
         return None
 

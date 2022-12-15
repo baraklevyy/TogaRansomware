@@ -4,6 +4,44 @@ import os
 import sys
 import re
 
+def get_entropy(filename):
+    """ Code from internet """
+    with open(filename, "rb") as file:
+        counters = {byte: 0 for byte in range(2 ** 8)}  # start all counters with zeros
+        for byte in file.read():  # read in chunks for large files
+            counters[byte] += 1  # increase counter for specified byte
+        filesize = file.tell()  # we can get file size by reading current position
+        probabilities = [counter / filesize for counter in counters.values()]  # calculate probabilities for each byte
+        entropy = -sum(probability * math.log2(probability) for probability in probabilities if probability > 0)  # final sum
+        print(entropy)
+
+
+class FileEntry(object):
+    """
+    Meta data on actual file
+    """
+
+    def __init__(self, path):
+        self._path = path
+        self._entropy = None
+
+    @property
+    def path(self):
+        return self._path
+
+    def __str__(self):
+        return self.path
+
+    def __repr_(self):
+        return self.path
+
+    @property
+    def entropy(self):
+        if self._entropy is None:
+            self._entropy = get_entroply(self._path)
+        return self._entropy
+
+
 class SnapFile(object):
     '''
     Contains filename, and list of paths in all snapshots
@@ -66,7 +104,7 @@ class Volume(object):
             for f in files:
                 full_path = os.path.join(root, f)
                 snapfile = self.files.setdefault(f, SnapFile(f, self._number_of_snaps))
-                snapfile.snap_paths[index] = full_path
+                snapfile.snap_paths[index] = FileEntry(full_path)
 
     def __iter__(self):
         return self.files.__iter__()
